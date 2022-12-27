@@ -70,7 +70,7 @@ func SignUpHandler(s server.Server) http.HandlerFunc {
 	}
 }
 
-func loginHandler(s server.Server) http.HandlerFunc {
+func LoginHandler(s server.Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var request = LoginRequest{}
 		err := json.NewDecoder(r.Body).Decode(&request)

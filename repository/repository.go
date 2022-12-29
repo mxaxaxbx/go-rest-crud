@@ -14,6 +14,7 @@ type Repository interface {
 	GetPostById(ctx context.Context, id string) (*models.Post, error)
 	UpdatePost(ctx context.Context, post *models.Post) (*models.Post, error)
 	DeletePost(ctx context.Context, id string) error
+	ListPost(ctx context.Context, page uint64) ([]*models.Post, error)
 	Close() error
 }
 
@@ -53,4 +54,8 @@ func UpdatePost(ctx context.Context, post *models.Post) (*models.Post, error) {
 
 func DeletePost(ctx context.Context, id string) error {
 	return implementation.DeletePost(ctx, id)
+}
+
+func ListPost(ctx context.Context, page uint64) ([]*models.Post, error) {
+	return implementation.ListPost(ctx, page)
 }

@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/golang-jwt/jwt"
@@ -135,5 +136,31 @@ func DeletePostHandler(s server.Server) http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
+	}
+}
+
+func ListPostHandler(s server.Server) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		pageStr := r.URL.Query().Get("page")
+		var page = uint64(0)
+		if pageStr == "" {
+			http.Error(w, "Invalid page parameter", http.StatusBadRequest)
+			return
+		}
+
+		page, err := strconv.ParseUint(pageStr, 10, 64)
+		if err != nil {
+			http.Error(w, "Invalid page parameter", http.StatusBadRequest)
+			return
+		}
+
+		post, err := repository.ListPost(r.Context(), page)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(post)
 	}
 }

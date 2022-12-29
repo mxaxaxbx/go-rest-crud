@@ -115,3 +115,31 @@ func (repo *PostgresRepository) DeletePost(ctx context.Context, id string) error
 	_, err := repo.db.ExecContext(ctx, "DELETE FROM posts WHERE id = $1", id)
 	return err
 }
+
+func (repo *PostgresRepository) ListPost(ctx context.Context, page uint64) ([]*models.Post, error) {
+	rows, err := repo.db.QueryContext(ctx, "SELECT * FROM posts LIMIT $1 OFFSET $2", 2, page*2)
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() {
+		err = repo.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+	var posts []*models.Post
+	for rows.Next() {
+		var post = models.Post{}
+		if err = rows.Scan(&post.Id, &post.PostContent, &post.CreatedAt, &post.UserId); err != nil {
+			return nil, err
+		}
+		posts = append(posts, &post)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}

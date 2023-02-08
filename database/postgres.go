@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 
 	_ "github.com/lib/pq"
@@ -14,6 +15,7 @@ type PostgresRepository struct {
 }
 
 func NewPostgresRepository(url string) (*PostgresRepository, error) {
+	fmt.Println(url)
 	db, err := sql.Open("postgres", url)
 
 	if err != nil {

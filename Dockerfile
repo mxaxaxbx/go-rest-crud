@@ -1,26 +1,29 @@
-# Dockerfile References: https://docs.docker.com/engine/reference/builder/
+ARG GO_VERSION=1.18.1
 
-# Start from golang:1.12-alpine base image
-FROM golang:1.18.1
+FROM golang:${GO_VERSION}-alpine AS builder
 
+RUN go env -w GOPROXY=direct
+RUN apk add --no-cache git
+RUN apk add --no-cache ca-certificates && update-ca-certificates
 
-# Set the Current Working Directory inside the container
-WORKDIR /app
-
-# Copy go mod and sum files
+WORKDIR /src
 COPY go.mod go.sum ./
-
-# Download all dependancies. Dependencies will be cached if the go.mod and go.sum files are not changed
 RUN go mod download
-
-# Copy the source from the current directory to the Working Directory inside the container
 COPY . .
 
-# Build the Go app
-RUN go build -o main .
+RUN CGO_ENABLED=0 go build \
+    -installsuffix 'static' \
+    -o /rest-ws
 
-# Expose port 8080 to the outside world
+FROM scratch AS runner
+
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY .env .
+COPY --from=builder /rest-ws /rest-ws
+
 EXPOSE 5050
+
+ENTRYPOINT [ "/rest-ws" ]
 
 # Run the executable
 CMD ["./main"]

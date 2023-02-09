@@ -17,12 +17,12 @@ var (
 )
 
 func shouldCheckToken(route string) bool {
-	for _, p := range NO_AUTH_NEEDED {
-		if strings.Contains(route, p) {
-			return false
-		}
-	}
-	return true
+	// for _, p := range NO_AUTH_NEEDED {
+	// 	if strings.Contains(route, p) {
+	// 		return false
+	// 	}
+	// }
+	return false
 }
 
 func CheckAuthMiddleware(s server.Server) func(h http.Handler) http.Handler {
